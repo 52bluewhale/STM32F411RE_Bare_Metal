@@ -14,12 +14,12 @@
  * @fn      - GPIO_PeriClockControl
  *
  * @brief   - this function enable/disable peripheral clock for the given GPIO port
- * 
+ *
  * @param   -   pGPIOx: base address of the GPIO peripheral
  * @param   -   EnorDi: ENABLE or DISABLE macros
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - none
  */
 void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi)
@@ -51,24 +51,24 @@ void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi)
             GPIOH_PCLK_EN();
         }
     }
-    else 
+    else
     {
         //to do
     }
 }
 
-/* 
+/*
  * @fn      - GPIO_Init
  *
  * @brief   - Initialize a GPIO pin according to the configuration in the
  *            supplied GPIO_Handle_t. Configures mode (including AF),
  *            output type, speed, pull-up/pull-down and alternate function.
- * 
+ *
  * @param   - pGPIOHandle: pointer to a GPIO_Handle_t that contains
  *                        the peripheral base address and pin settings.
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - The peripheral clock for the GPIO port must be enabled prior to
  *            calling this function. Interrupt mode handling is not implemented
  *            in this function (placeholder present in code).
@@ -112,12 +112,12 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
         // 2. Configure the GPIO port selection in SYSCFG_EXTICR
         uint8_t temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 4;
         uint8_t temp2 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 4;
-        uint8_t portcode = GPIO_BASEADDR_TO_CODE(pGPIOHandle->pGPIOx)
+        uint8_t portcode = GPIO_BASEADDR_TO_CODE(pGPIOHandle->pGPIOx);
 
         SYSCFG_PCLK_EN();
         SYSCFG->EXTICR[temp1] = portcode << (temp2 * 4);
 
-        // 3. Enable EXTI interrupt delivery using IMR 
+        // 3. Enable EXTI interrupt delivery using IMR
         EXTI->IMR |= (1U << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
     }
     temp = 0;
@@ -152,15 +152,15 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
     }
 }
 
-/* 
+/*
  * @fn      - GPIO_DeInit
  *
  * @brief   - Reset the GPIO peripheral registers to their reset state.
- * 
+ *
  * @param   - pGPIOx: base address of the GPIO peripheral to be reset
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - This issues a reset pulse via the RCC AHB1 peripheral reset
  *            register macros (GPIOx_PCLK_RESET()). Other peripherals are
  *            unaffected because each macro toggles only the target bit.
@@ -193,16 +193,16 @@ void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
     }
 }
 
-/* 
+/*
  * @fn      - GPIO_ReadFromInputPin
  *
  * @brief   - Read the logic level present on a single input pin.
- * 
+ *
  * @param   - pGPIOx:    base address of the GPIO peripheral
  * @param   - PinNumber: pin index (0..15)
- * 
+ *
  * @return  - uint8_t: 0 if pin is low, 1 if pin is high
- * 
+ *
  * @note    - Returns the current state from the IDR register. This is a
  *            read-only operation and is safe for single-bit reads. For
  *            guaranteed atomic access in concurrent environments the
@@ -216,15 +216,15 @@ uint8_t GPIO_ReadFromInputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
     return value;
 }
 
-/* 
+/*
  * @fn      - GPIO_ReadFromInputPort
  *
  * @brief   - Read the entire 16-bit input data register for a GPIO port.
- * 
+ *
  * @param   - pGPIOx: base address of the GPIO peripheral
- * 
+ *
  * @return  - uint16_t: lower 16 bits reflect pin states [15:0]
- * 
+ *
  * @note    - Useful when reading parallel buses or multiple inputs at once.
  */
 uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx)
@@ -235,17 +235,17 @@ uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx)
     return value;
 }
 
-/* 
+/*
  * @fn      - GPIO_WriteToOutputPin
  *
  * @brief   - Set or reset a single GPIO output pin.
- * 
+ *
  * @param   - pGPIOx:    base address of the GPIO peripheral
  * @param   - PinNumber: pin index (0..15)
  * @param   - Value:     GPIO_PIN_SET (1) to set, GPIO_PIN_RESET (0) to clear
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - Current implementation uses ODR read-modify-write. For atomic
  *            set/reset without read-modify-write use the BSRR register if
  *            available (BSRR can set and reset individual pins atomically).
@@ -257,23 +257,23 @@ void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber, uint8_t Val
         // Write 1 to output data register at corresponding pin number
         pGPIOx->ODR |= (1<<PinNumber);
     }
-    else 
+    else
     {
         // Write 0 to output data register at corresponding pin number
         pGPIOx->ODR &= ~(1<<PinNumber);
     }
 }
 
-/* 
+/*
  * @fn      - GPIO_WriteToOutputPort
  *
  * @brief   - Write a 16-bit value to the port output data register (ODR).
- * 
+ *
  * @param   - pGPIOx: base address of the GPIO peripheral
  * @param   - Value:  lower 16 bits written to ODR
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - Overwrites the entire ODR. To change single bits without
  *            affecting others prefer BSRR (set/reset) or per-pin operations.
  */
@@ -282,16 +282,16 @@ void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint8_t Value)
     pGPIOx->ODR = Value;
 }
 
-/* 
+/*
  * @fn      - GPIO_ToggleOutputPin
  *
  * @brief   - Toggle the specified output pin (invert its current state).
- * 
+ *
  * @param   - pGPIOx:    base address of the GPIO peripheral
  * @param   - PinNumber: pin index (0..15)
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - Uses XOR on ODR. This is a read-modify-write operation and may
  *            not be atomic; for atomic toggle consider disabling interrupts
  *            briefly or using hardware features if the MCU provides them.
@@ -301,17 +301,17 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
     pGPIOx->ODR ^= (1<<PinNumber);
 }
 
-/* 
- * @fn      - 
+/*
+ * @fn      -
  *
- * @brief   - 
- * 
- * @param   -   
- * @param   -   
- * 
- * @return  - 
- * 
- * @note    - 
+ * @brief   -
+ *
+ * @param   -
+ * @param   -
+ *
+ * @return  -
+ *
+ * @note    -
  */
 void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 {
@@ -333,7 +333,7 @@ void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
             *NVIC_ISER3 |= (1U << (IRQNumber % 64));
         }
     }
-    else 
+    else
     {
         if (IRQNumber <= 31)
         {
@@ -351,20 +351,20 @@ void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
             *NVIC_ICER3 |= (1U << (IRQNumber % 64));
         }
     }
-    
+
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
 {
@@ -376,22 +376,22 @@ void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
 
     // Calculating the shift amount
     uint8_t shift_amount = (8 * iprx_section) + (8 - NO_PR_BITS_IMPLEMENTED);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
     // Setting the priority
     *(NVIC_PR_BASE_ADDR + iprx) |= (IRQPriority << (shift_amount));
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void GPIO_IRQHandling(uint8_t PinNumber)
 {

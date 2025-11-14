@@ -49,32 +49,64 @@ void SPI2_Inits(void)
     SPI2Handle.pSPIx = SPI2;
     SPI2Handle.SPIConfig.SPI_BusConfig = SPI_BUS_CONFIG_FD;
     SPI2Handle.SPIConfig.SPI_DeviceMode = SPI_DEVICE_MOD_MASTER;
-    SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_CLK_SPEED_DIV2;        // 8 MHz
+    SPI2Handle.SPIConfig.SPI_SclkSpeed = SPI_CLK_SPEED_DIV8;        // 2 MHz
     SPI2Handle.SPIConfig.SPI_DFF = SPI_DFF_8BITS;
     SPI2Handle.SPIConfig.SPI_CPOL = SPI_CPOL_LOW;
     SPI2Handle.SPIConfig.SPI_CPHA = SPI_CPHA_LOW;
-    SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_EN;                      // Sw slave management enabled for NSS
+    SPI2Handle.SPIConfig.SPI_SSM = SPI_SSM_DI;                      // Hw slave management enabled for NSS
 
     SPI_Init(&SPI2Handle);
+}
+
+void GPIO_ButtonInit(void)
+{
+    GPIO_Handle_t GPIO_BUTTON;
+    GPIO_BUTTON.pGPIOx = GPIOA;
+    GPIO_BUTTON.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_5;
+    GPIO_BUTTON.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IN;
+    GPIO_BUTTON.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+    GPIO_BUTTON.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_NO_PUPD;
+
+    GPIO_Init(&GPIO_BUTTON);
+}
+
+void delay (void)
+{
+    for (uint32_t i = 0; i < 500000 / 2; i++);
 }
 
 int main(void)
 {
     char user_data[] = "Hello World";
 
+    GPIO_ButtonInit()
+
     SPI2_GPIOInits();
 
     SPI2_Inits();
 
-    SPI_SSIConfig(SPI2, ENABLE);
+    SPI_SSOEConfig(SPI2, ENABLE);
 
-    SPI_PeripheralControl(SPI2, ENABLE);
+    while (1)
+    {
 
-    SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+        while (!(GPIO_ReadFromInputPin(GPIOA, GPIO_PIN_5)));
 
-    SPI_PeripheralControl(SPI2, DISABLE);
+        delay();
 
-    while(1);
+        // SPI_SSIConfig(SPI2, ENABLE);
+
+        SPI_PeripheralControl(SPI2, ENABLE);
+
+        uint8_t dataLen = strlen(user_data);
+        SPI_SendData(SPI2, &dataLen, 1)
+
+        SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+
+        while (SPI_GetFlagStatus(SPI2, SPI_SR_BSY));
+
+        SPI_PeripheralControl(SPI2, DISABLE);
+    }
 
     return 0;
 }

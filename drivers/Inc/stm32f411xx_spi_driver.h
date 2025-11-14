@@ -1,3 +1,10 @@
+/*
+ * stm32f411xx_spi_driver_new.h
+ *
+ *  Created on: Nov 11, 2025
+ *      Author: phanc
+ */
+
 #ifndef INC_STM32F411XX_SPI_DRIVER_H_
 #define INC_STM32F411XX_SPI_DRIVER_H_
 
@@ -13,7 +20,7 @@
 /* ========================= SPI HANDLING STRUCTURE ========================= */
 
 /* Configuration structure for SPIx peripheral */
-typedef struct 
+typedef struct
 {
     uint8_t SPI_DeviceMode;
     uint8_t SPI_BusConfig;
@@ -25,9 +32,9 @@ typedef struct
 } SPI_Config_t;
 
 /* Handle structure for SPIx peripheral */
-typedef struct 
+typedef struct
 {
-    SPI_RegDef_t *pSPIx;
+	SPI_RegDef_t *pSPIx;
     SPI_Config_t SPIConfig;
 } SPI_Handle_t;
 
@@ -105,15 +112,15 @@ typedef struct
 #define SPI_SR_FRE                          8       // Bit 8 FRE: Frame format error
 
 // SPI flag for status register (SPI_SR)
-#define SPI_SR_RXNE                         (1 << SPI_SR_RXNE)       
-#define SPI_SR_TXE                          (1 << SPI_SR_TXE)      
-#define SPI_SR_CHSIDE                       (2 << SPI_SR_CHSIDE)       
-#define SPI_SR_UDR                          (3 << SPI_SR_UDR)     
-#define SPI_SR_CRCERR                       (4 << SPI_SR_CRCERR)
-#define SPI_SR_MODF                         (5 << SPI_SR_MODF)
-#define SPI_SR_OVR                          (6 << SPI_SR_OVR)
-#define SPI_SR_BSY                          (7 << SPI_SR_BSY)
-#define SPI_SR_FRE                          (8 << SPI_SR_FRE)    
+#define SPI_SR_RXNE_FLAG                    (1 << SPI_SR_RXNE)
+#define SPI_SR_TXE_FLAG                     (1 << SPI_SR_TXE)
+#define SPI_SR_CHSIDE_FLAG                  (1 << SPI_SR_CHSIDE)
+#define SPI_SR_UDR_FLAG                     (1 << SPI_SR_UDR)
+#define SPI_SR_CRCERR_FLAG                  (1 << SPI_SR_CRCERR)
+#define SPI_SR_MODF_FLAG                    (1 << SPI_SR_MODF)
+#define SPI_SR_OVR_FLAG                     (1 << SPI_SR_OVR)
+#define SPI_SR_BSY_FLAG                     (1 << SPI_SR_BSY)
+#define SPI_SR_FRE_FLAG                     (1 << SPI_SR_FRE)
 
 /* ========================= SPI APIs ========================= */
 
@@ -123,6 +130,9 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
 /* Init and De-Init */
 void SPI_Init(SPI_Handle_t *pSPIHandle);
 void SPI_DeInit(SPI_RegDef_t *pSPIx);
+
+/* Get flag status */
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName);
 
 /* Data send and receive */
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len);
@@ -135,5 +145,7 @@ void SPI_IRQHandling(SPI_Handle_t *pHandle);
 
 /* Other APIs support SPI */
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 
 #endif /* INC_STM32F411XX_SPI_DRIVER_H_ */

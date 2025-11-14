@@ -1,16 +1,16 @@
 #include "stm32f411xx_spi_driver.h"
 
-/* 
- * @fn      - 
+/*
+ * @fn      -
  *
- * @brief   - 
- * 
- * @param   -   
- * @param   -   
- * 
- * @return  - 
- * 
- * @note    - 
+ * @brief   -
+ *
+ * @param   -
+ * @param   -
+ *
+ * @return  -
+ *
+ * @note    -
  */
 void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
 {
@@ -37,23 +37,23 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
             SPI5_PCLK_EN();
         }
     }
-    else 
+    else
     {
         // TODO
     }
 }
 
-/* 
- * @fn      - 
+/*
+ * @fn      -
  *
- * @brief   - 
- * 
- * @param   -   
- * @param   -   
- * 
- * @return  - 
- * 
- * @note    - 
+ * @brief   -
+ *
+ * @param   -
+ * @param   -
+ *
+ * @return  -
+ *
+ * @note    -
  */
 void SPI_Init(SPI_Handle_t *pSPIHandle)
 {
@@ -83,7 +83,7 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
         tempreg &= ~(1 << SPI_CR1_BIDIMODE);
 
         // RXONLY bit must be set
-        tempreg |= (1 << SPI_CR1_RXONLY)
+        tempreg |= (1 << SPI_CR1_RXONLY);
     }
 
     // 3. Configure the SPI serial clock speed (BaudRate)
@@ -101,15 +101,15 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
     pSPIHandle->pSPIx->CR1 = tempreg;
 }
 
-/* 
+/*
  * @fn      - SPI_DeInit
  *
  * @brief   - Reset the SPI peripheral registers to their reset state.
- * 
+ *
  * @param   - pSPIx: base address of the SPI peripheral to be reset
- * 
+ *
  * @return  - none
- * 
+ *
  * @note    - This issues a reset pulse via the RCC APBx peripheral reset
  *            register macros (SPIx_PCLK_RESET()). Other peripherals are
  *            unaffected because each macro toggles only the target bit.
@@ -138,46 +138,46 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
     }
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName)
 {
     if (pSPIx->SR & FlagName)
     {
-        return FLAG_SET
+        return FLAG_SET;
     }
 
     return FLAG_RESET;
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
 * @note    - Polling API send data
 */
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
 {
-    while (len > 0)
+    while (Len > 0)
     {
         // 1. Wait for TXE is set
-        while (SPI_GetFlagStatus(pSPIx, SPI_SR_TXE) == FLAG_RESET);
+        while (SPI_GetFlagStatus(pSPIx, SPI_SR_TXE_FLAG) == FLAG_RESET);
 
         // 2. Check the DFF bit in CR1
         if (pSPIx->CR1 & (1 << SPI_CR1_DFF))
@@ -189,7 +189,7 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
             Len--;
             (uint16_t*)pTxBuffer++;
         }
-        else 
+        else
         {
             /* 8-bit DFF hanlde */
             // 1. Load the data into the DR
@@ -200,85 +200,108 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
     }
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len)
 {
+    while (Len > 0)
+    {
+        // 1. Wait for RXE is set
+        while (SPI_GetFlagStatus(pSPIx, SPI_SR_RXNE_FLAG) == FLAG_RESET);
 
+        // 2. Check the DFF bit in CR1
+        if (pSPIx->CR1 & (1 << SPI_CR1_DFF))
+        {
+            /* 16-bit DFF handle */
+            // 1. Load the data from DR to RxBuffer
+            *((uint16_t*)pRxBuffer) = pSPIx->DR;
+            Len--;
+            Len--;
+            (uint16_t*)pRxBuffer++;
+        }
+        else
+        {
+            /* 8-bit DFF hanlde */
+            // 1. Load the data into the DR
+            *(pRxBuffer) = pSPIx->DR;
+            Len--;
+            pRxBuffer++;
+        }
+    }
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 {
 
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 {
 
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void SPI_IRQHandling(SPI_Handle_t *pHandle)
 {
 
 }
 
-/* 
-* @fn      - 
+/*
+* @fn      -
 *
-* @brief   - 
-* 
-* @param   -   
-* @param   -   
-* 
-* @return  - 
-* 
-* @note    - 
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
 */
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
 {
@@ -286,8 +309,56 @@ void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
     {
         pSPIx->CR1 |= (1 << SPI_CR1_SPE);
     }
-    else 
+    else
     {
         pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
+    }
+}
+
+/*
+* @fn      -
+*
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
+*/
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
+{
+    if (EnOrDi == ENABLE)
+    {
+        pSPIx->CR1 |= (1 << SPI_CR1_SSI);
+    }
+    else
+    {
+        pSPIx->CR1 &= ~(1 << SPI_CR1_SSI);
+    }
+}
+
+/*
+* @fn      -
+*
+* @brief   -
+*
+* @param   -
+* @param   -
+*
+* @return  -
+*
+* @note    -
+*/
+void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi)
+{
+    if (EnOrDi == ENABLE)
+    {
+        pSPIx->CR2 |= (1 << SPI_CR2_SSOE);
+    }
+    else
+    {
+        pSPIx->CR2 &= ~(1 << SPI_CR2_SSOE);
     }
 }

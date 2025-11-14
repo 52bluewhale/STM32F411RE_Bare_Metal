@@ -1,7 +1,7 @@
 /*
- * stm32f411xx.h
+ * stm32f411xx_new.h
  *
- *  Created on: Oct 15, 2025
+ *  Created on: Nov 11, 2025
  *      Author: phanc
  */
 
@@ -9,8 +9,6 @@
 #define INC_STM32F411XX_H_
 
 #include <stdint.h>
-#include "stm32f411xx_gpio_driver.h"
-#include "stm32f411xx_spi_driver.h"
 
 /* Base addresses of FLASH and SRAM memories */
 #define FLASH_BASEADDR                  0x08000000U
@@ -99,9 +97,9 @@
 
 /* Peripheral register definition structures */
 
-typedef struct 
+typedef struct
 {
-    volatile uint32_t MODER;         // Offset: 0x00 - GPIO port mode register 
+    volatile uint32_t MODER;         // Offset: 0x00 - GPIO port mode register
     volatile uint32_t OTYPER;        // Offset: 0x04 - GPIO port output type register
     volatile uint32_t OSPEEDR;       // Offset: 0x08 - GPIO port output speed register
     volatile uint32_t PUPDR;         // Offset: 0x0C - GPIO port pull-up/pull-down register
@@ -117,11 +115,11 @@ typedef struct
 {
     volatile uint32_t CR;           // Offset: 0x00 - RCC clock control register
     volatile uint32_t PLLCFGR;      // Offset: 0x04 - PLL (Phase-Clock Loop) configuration register
-    volatile uint32_t CFGR;         // Offset: 0x08 - Clock configuration register 
+    volatile uint32_t CFGR;         // Offset: 0x08 - Clock configuration register
     volatile uint32_t CIR;          // Offset: 0x0C - Clock interrupt register
     volatile uint32_t AHB1RSTR;     // Offset: 0x10 - AHB1 peripheral reset register
     volatile uint32_t AHB2RSTR;     // Offset: 0x14 - AHB2 peripheral reset register
-    uint32_t RESERVED0[2];          
+    uint32_t RESERVED0[2];
     volatile uint32_t APB1RSTR;     // Offset: 0x20 - APB1 peripheral reset register
     volatile uint32_t APB2RSTR;     // Offset: 0x24 - APB2 peripheral reset register
     uint32_t RESERVED1[2];
@@ -147,7 +145,7 @@ typedef struct
 } RCC_RegDef_t;
 
 /* Peripheral register for EXTI*/
-typedef struct 
+typedef struct
 {
     volatile uint32_t IMR;          // Offset: 0x00 - Interrupt mask register
     volatile uint32_t EMR;          // Offset: 0x04 - Event mask register
@@ -158,13 +156,13 @@ typedef struct
 } EXTI_RegDef_t;
 
 /* Peripheral register for SYSCFG */
-typedef struct 
+typedef struct
 {
     volatile uint32_t MEMRMP;       // Offset: 0x00 - memory remap register
     volatile uint32_t PMC;          // Offset: 0x04 - peripheral mode configuration register
     volatile uint32_t EXTICR[4];    // Offset: 0x08 - external interrupt configuration register 1
     uint32_t RESERVED[2];
-    volatile uint32_t CMPCR;        // Offset: 0x20 - Compensation cell control register 
+    volatile uint32_t CMPCR;        // Offset: 0x20 - Compensation cell control register
 } SYSCFG_RegDef_t;
 
 /* Peripheral register for SPI */
@@ -173,7 +171,7 @@ typedef struct
     volatile uint32_t CR1;          // Offset: 0x00 - SPI control register 1
     volatile uint32_t CR2;          // Offset: 0x04 - SPI control register 2
     volatile uint32_t SR;           // Offset: 0x08 - SPI status register
-    volatile uint32_t DR;           // Offset: 0x0C - SPI data register 
+    volatile uint32_t DR;           // Offset: 0x0C - SPI data register
     volatile uint32_t CRCPR;        // Offset: 0x10 - SPI CRC polynomial register
     volatile uint32_t RXCRCR;       // Offset: 0x14 - SPI RX CRC register
     volatile uint32_t TXCRCR;       // Offset: 0x18 - SPI TX CRC register
@@ -207,13 +205,13 @@ typedef struct
 #define GPIOB_PCLK_RESET() \
     do {(RCC->AHB1RSTR |= (1U<<1)); (RCC->AHB1RSTR &= ~(1U<<1));} while(0)
 #define GPIOC_PCLK_RESET() \
-    do {(RCC->AHB1RSTR |= (1U<<2)); (RCC->AHB1RSTR &= ~(1U<<2));} while(0)  
+    do {(RCC->AHB1RSTR |= (1U<<2)); (RCC->AHB1RSTR &= ~(1U<<2));} while(0)
 #define GPIOD_PCLK_RESET() \
-    do {(RCC->AHB1RSTR |= (1U<<3)); (RCC->AHB1RSTR &= ~(1U<<3));} while(0)  
+    do {(RCC->AHB1RSTR |= (1U<<3)); (RCC->AHB1RSTR &= ~(1U<<3));} while(0)
 #define GPIOE_PCLK_RESET() \
-    do {(RCC->AHB1RSTR |= (1U<<4)); (RCC->AHB1RSTR &= ~(1U<<4));} while(0)  
+    do {(RCC->AHB1RSTR |= (1U<<4)); (RCC->AHB1RSTR &= ~(1U<<4));} while(0)
 #define GPIOH_PCLK_RESET() \
-    do {(RCC->AHB1RSTR |= (1U<<7)); (RCC->AHB1RSTR &= ~(1U<<7));} while(0)  
+    do {(RCC->AHB1RSTR |= (1U<<7)); (RCC->AHB1RSTR &= ~(1U<<7));} while(0)
 
 /* I2Cx enable bit definitions */
 #define I2C1_PCLK_EN()        (RCC->APB1ENR |= (1U<<21))
@@ -267,12 +265,14 @@ typedef struct
 /* SYSCFG disable bit definition */
 #define SYSCFG_PCLK_DI()      (RCC->APB2ENR &= ~(1U<<14))
 
-#define GPIO_BASEADDR_TO_CODE(x)       ((x == GPIOA) ? 0 : \
-                                        (x == GPIOB) ? 1 : \
-                                        (x == GPIOC) ? 2 : \
-                                        (x == GPIOD) ? 3 : \
-                                        (x == GPIOE) ? 4 : \
-                                        (x == GPIOH) ? 7 : 0)
+#define GPIO_BASEADDR_TO_CODE(x) \
+    ( ((x) == GPIOA) ? 0U : \
+      ((x) == GPIOB) ? 1U : \
+      ((x) == GPIOC) ? 2U : \
+      ((x) == GPIOD) ? 3U : \
+      ((x) == GPIOE) ? 4U : \
+      ((x) == GPIOH) ? 7U : \
+      0U )
 
 /* Interrupt definitions*/
 #define EXTI        ((EXTI_RegDef_t *)EXTI_BASEADDR)
@@ -288,8 +288,4 @@ typedef struct
 #define FLAG_SET            SET
 #define FLAG_RESET          RESET
 
-
 #endif /* INC_STM32F411XX_H_ */
-
-
-
