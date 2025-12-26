@@ -79,7 +79,7 @@ int main(void)
 {
     char user_data[] = "Hello World";
 
-    GPIO_ButtonInit()
+    GPIO_ButtonInit();
 
     SPI2_GPIOInits();
 
@@ -99,7 +99,7 @@ int main(void)
         SPI_PeripheralControl(SPI2, ENABLE);
 
         uint8_t dataLen = strlen(user_data);
-        SPI_SendData(SPI2, &dataLen, 1)
+        SPI_SendData(SPI2, &dataLen, 1);
 
         SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
 

@@ -1,4 +1,4 @@
-Src/006_spi_test.o: ../Src/006_spi_test.c \
+Src/008_spi_rx_cmd_arduino.o: ../Src/008_spi_rx_cmd_arduino.c \
  F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h \
  F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx_gpio_driver.h \
  F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h \

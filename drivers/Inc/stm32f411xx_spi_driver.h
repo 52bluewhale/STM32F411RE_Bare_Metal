@@ -17,6 +17,17 @@
 #define SPI4        ((SPI_RegDef_t *)SPI4_I2S4_BASEADDR)
 #define SPI5        ((SPI_RegDef_t *)SPI5_I2S5_BASEADDR)
 
+/* SPI macros for application states */
+#define SPI_READY                       0
+#define SPI_BUSY_IN_RX                  1
+#define SPI_BUSY_IN_TX                  2
+
+/* SPI application event */
+#define SPI_EVENT_TX_CMPLT              1
+#define SPI_EVENT_RX_CMPLT              2
+#define SPI_EVENT_OVR_ERR               3
+#define SPI_EVENT_CRC_ERR               4
+
 /* ========================= SPI HANDLING STRUCTURE ========================= */
 
 /* Configuration structure for SPIx peripheral */
@@ -36,6 +47,12 @@ typedef struct
 {
 	SPI_RegDef_t *pSPIx;
     SPI_Config_t SPIConfig;
+    uint8_t *pTxBuffer;
+    uint8_t *pRxBuffer;
+    uint32_t TxLen;
+    uint32_t RxLen;
+    uint8_t TxState;
+    uint8_t RxState;
 } SPI_Handle_t;
 
 /* ========================= SPI MACROS ========================= */
@@ -75,11 +92,13 @@ typedef struct
 #define SPI_SSM_EN                          1
 #define SPI_SSM_DI                          0
 
+/* ========================= SPI REGISTER BIT POSITION DEFINITIONS ========================= */
+
 // SPI control register 1 (SPI_CR1)
 #define SPI_CR1_CPHA                        0       // Bit 0 CPHA: Clock phase
-#define SPI_CR1_CPOL                        1       // Bit1 CPOL: Clock polarity
+#define SPI_CR1_CPOL                        1       // Bit 1 CPOL: Clock polarity
 #define SPI_CR1_MSTR                        2       // Bit 2 MSTR: Master selection
-#define SPI_CR1_BR                          3       // Bits 5:3 BR[2:0]: Baud rate control
+#define SPI_CR1_BR                          3       // Bit [5:3] BR[2:0]: Baud rate control
 #define SPI_CR1_SPE                         6       // Bit 6 SPE: SPI enable
 #define SPI_CR1_LSBFIRST                    7       // Bit 7 LSBFIRST: Frame format
 #define SPI_CR1_SSI                         8       // Bit 8 SSI: Internal slave select
@@ -111,16 +130,18 @@ typedef struct
 #define SPI_SR_BSY                          7       // Bit 7 BSY: Busy flag
 #define SPI_SR_FRE                          8       // Bit 8 FRE: Frame format error
 
+/* ========================= SPI FLAG DEFINITIONS ========================= */
+
 // SPI flag for status register (SPI_SR)
-#define SPI_SR_RXNE_FLAG                    (1 << SPI_SR_RXNE)
-#define SPI_SR_TXE_FLAG                     (1 << SPI_SR_TXE)
-#define SPI_SR_CHSIDE_FLAG                  (1 << SPI_SR_CHSIDE)
-#define SPI_SR_UDR_FLAG                     (1 << SPI_SR_UDR)
-#define SPI_SR_CRCERR_FLAG                  (1 << SPI_SR_CRCERR)
-#define SPI_SR_MODF_FLAG                    (1 << SPI_SR_MODF)
-#define SPI_SR_OVR_FLAG                     (1 << SPI_SR_OVR)
-#define SPI_SR_BSY_FLAG                     (1 << SPI_SR_BSY)
-#define SPI_SR_FRE_FLAG                     (1 << SPI_SR_FRE)
+#define SPI_SR_RXNE_FLAG                    (1U << SPI_SR_RXNE)
+#define SPI_SR_TXE_FLAG                     (1U << SPI_SR_TXE)
+#define SPI_SR_CHSIDE_FLAG                  (1U << SPI_SR_CHSIDE)
+#define SPI_SR_UDR_FLAG                     (1U << SPI_SR_UDR)
+#define SPI_SR_CRCERR_FLAG                  (1U << SPI_SR_CRCERR)
+#define SPI_SR_MODF_FLAG                    (1U << SPI_SR_MODF)
+#define SPI_SR_OVR_FLAG                     (1U << SPI_SR_OVR)
+#define SPI_SR_BSY_FLAG                     (1U << SPI_SR_BSY)
+#define SPI_SR_FRE_FLAG                     (1U << SPI_SR_FRE)
 
 /* ========================= SPI APIs ========================= */
 
@@ -134,9 +155,13 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx);
 /* Get flag status */
 uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName);
 
-/* Data send and receive */
+/* Polling Data send and receive */
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len);
 void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len);
+
+/* Interrupt Data send and receive */
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer, uint32_t Len);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer, uint32_t Len);
 
 /* IRQ configuration and ISR handling */
 void SPI_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi);
@@ -147,5 +172,11 @@ void SPI_IRQHandling(SPI_Handle_t *pHandle);
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
 void SPI_SSOEConfig(SPI_RegDef_t *pSPIx, uint8_t EnOrDi);
+void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx);
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle);
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle);
+
+/* SPI application callback */
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t AppEv);
 
 #endif /* INC_STM32F411XX_SPI_DRIVER_H_ */

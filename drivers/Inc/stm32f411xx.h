@@ -9,6 +9,7 @@
 #define INC_STM32F411XX_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* Base addresses of FLASH and SRAM memories */
 #define FLASH_BASEADDR                  0x08000000U
@@ -91,12 +92,30 @@
 #define IRQ_EXTI9_5                     23
 #define IRQ_EXTI15_10                   40
 
+#define IRQ_SPI1                        35                      // Addr: 0x0000 00CC - SPI1 global interrupt
+#define IRQ_SPI2                        36                      // Addr: 0x0000 00D0 - SPI2 global interrupt
+#define IRQ_SPI3                        51                      // Addr: 0x0000 010C - SPI3 global interrupt
+#define IRQ_SPI4                        84                      // Addr: 0x0000 0190 - SPI4 global interrupt
+#define IRQ_SPI5                        85                      // Addr: 0x0000 0194 - SPI5 global interrupt
+
+#define IRQ_I2C1_EV                     31                      // Addr: 0x0000 00BC - I2C1 event interrupt
+#define IRQ_I2C1_ER                     32                      // Addr: 0x0000 00C0 - I2C1 error interrupt
+#define IRQ_I2C2_EV                     33                      // Addr: 0x0000 00C4 - I2C2 event interrupt    
+#define IRQ_I2C2_ER                     34                      // Addr: 0x0000 00C8 - I2C2 error interrupt
+#define IRQ_I2C3_EV                     72                      // Addr: 0x0000 0160 - I2C3 event interrupt
+#define IRQ_I2C3_ER                     73                      // Addr: 0x0000 0164 - I2C3 error interrupt
+
+#define IRQ_USART1                      37                      // Addr: 0x0000 00D4 - USART1 global interrupt
+#define IRQ_USART2                      38                      // Addr: 0x0000 00D8 - USART2 global interrupt
+#define IRQ_USART6                      71                      // Addr: 0x0000 015C - USART6 global interrupt
+
 /* NVIC priority levels */
 #define NVIC_IRQ_PRI0                   0
 #define NVIC_IRQ_PRI15                  15
 
-/* Peripheral register definition structures */
+/* ========================= PERIPHERAL REGISTER DEFINITION STRUCTURES ========================= */
 
+/* Peripheral register definition structure for GPIO */
 typedef struct
 {
     volatile uint32_t MODER;         // Offset: 0x00 - GPIO port mode register
@@ -111,6 +130,7 @@ typedef struct
                                      // Offset: 0x24 - GPIO alternate function high register
 } GPIO_RegDef_t;
 
+/* Peripheral register definition structure for RCC */
 typedef struct
 {
     volatile uint32_t CR;           // Offset: 0x00 - RCC clock control register
@@ -179,9 +199,31 @@ typedef struct
     volatile uint32_t I2SPR;        // Offset: 0x20 - SPI_I2S prescaler register
 } SPI_RegDef_t;
 
+/* Peripheral register for I2C */
+typedef struct 
+{
+    volatile uint32_t CR1;          // Offset: 0x00 - I2C Control register 1 
+    volatile uint32_t CR2;          // Offset: 0x04 - I2C Control register 2
+    volatile uint32_t OAR1;         // Offset: 0x08 - I2C Own address register 1
+    volatile uint32_t OAR2;         // Offset: 0x0C - I2C Own address register 1
+    volatile uint32_t DR;           // Offset: 0x10 - I2C Data register 
+    volatile uint32_t SR1;          // Offset: 0x14 - I2C Status register 1
+    volatile uint32_t SR2;          // Offset: 0x18 - I2C Status register 2
+    volatile uint32_t CCR;          // Offset: 0x1C - I2C Clock control register
+    volatile uint32_t TRISE;        // Offset: 0x20 - I2C TRISE register 
+    volatile uint32_t FLTR;         // Offset: 0x24 - I2C TRISE register 
+} I2C_RegDef_t;
+
+/* ========================= PERIPHERAL DEFINITIONS ========================= */
 
 /* RCC definition */
 #define RCC         ((RCC_RegDef_t *)RCC_BASEADDR)
+
+/* Interrupt definitions*/
+#define EXTI        ((EXTI_RegDef_t *)EXTI_BASEADDR)
+#define SYSCFG      ((SYSCFG_RegDef_t *)SYSCFG_BASEADDR)
+
+/* ========================= CLOCK ENABLE/DISABLE MACROS ========================= */
 
 /* GPIOx enable bit definitions */
 #define GPIOA_PCLK_EN()       (RCC->AHB1ENR |= (1U<<0))
@@ -222,6 +264,14 @@ typedef struct
 #define I2C1_PCLK_DI()        (RCC->APB1ENR &= ~(1U<<21))
 #define I2C2_PCLK_DI()        (RCC->APB1ENR &= ~(1U<<22))
 #define I2C3_PCLK_DI()        (RCC->APB1ENR &= ~(1U<<23))
+
+/* I2Cx reset bit definitions */
+#define I2C1_PCLK_RESET() \
+    do {(RCC->APB1RSTR |= (1U << 21)); (RCC->APB1RSTR &= ~(1U << 21));} while(0)
+#define I2C2_PCLK_RESET() \
+    do {(RCC->APB1RSTR |= (1U << 22)); (RCC->APB1RSTR &= ~(1U << 22));} while(0)
+#define I2C3_PCLK_RESET() \
+    do {(RCC->APB1RSTR |= (1U << 23)); (RCC->APB1RSTR &= ~(1U << 23));} while(0)
 
 /* SPIx enable bit definitions */
 #define SPI1_PCLK_EN()        (RCC->APB2ENR |= (1U<<12))
@@ -265,6 +315,8 @@ typedef struct
 /* SYSCFG disable bit definition */
 #define SYSCFG_PCLK_DI()      (RCC->APB2ENR &= ~(1U<<14))
 
+/* ========================= HELPER MACROS ========================= */
+
 #define GPIO_BASEADDR_TO_CODE(x) \
     ( ((x) == GPIOA) ? 0U : \
       ((x) == GPIOB) ? 1U : \
@@ -272,11 +324,7 @@ typedef struct
       ((x) == GPIOD) ? 3U : \
       ((x) == GPIOE) ? 4U : \
       ((x) == GPIOH) ? 7U : \
-      0U )
-
-/* Interrupt definitions*/
-#define EXTI        ((EXTI_RegDef_t *)EXTI_BASEADDR)
-#define SYSCFG      ((SYSCFG_RegDef_t *)SYSCFG_BASEADDR)
+      0U );
 
 /* Generic macros */
 #define ENABLE              1
@@ -286,6 +334,6 @@ typedef struct
 #define GPIO_PIN_SET        SET
 #define GPIO_PIN_RESET      RESET
 #define FLAG_SET            SET
-#define FLAG_RESET          RESET
+#define FLAG_RESET          
 
 #endif /* INC_STM32F411XX_H_ */
