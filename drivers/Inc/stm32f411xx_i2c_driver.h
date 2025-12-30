@@ -182,9 +182,13 @@ void I2C_DeInit(I2C_RegDef_t *pI2Cx);
 /* Get flag status */
 uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t FlagName);
 
-/* Data send and receive */
+/* Data send and receive in Master mode*/
 void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint8_t Len, uint8_t SlaveAddr, uint8_t Sr);
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer, uint8_t Len, uint8_t SlaveAddr, uint8_t Sr);
+
+/* Data send and receive in Slave mode*/
+void I2C_SlaveSendData(I2C_RegDef_t *pI2C, uint8_t data);
+uint8_t I2C_SlaveReceiveData(I2C_RegDef_t *pI2C);
 
 /* Data send and receive with Interrupt*/
 uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer, uint8_t Len, uint8_t SlaveAddr, uint8_t Sr);
@@ -201,6 +205,9 @@ void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi);
 void I2C_ManageACK(I2C_RegDef_t *pI2Cx, uint8_t EnOrDi);
 void I2C_CloseSendData(I2C_Handle_t *pI2CHandle);
 void I2C_CloseReceiveData(I2C_Handle_t *pI2CHandle);
+void I2C_GenerateStartCondition(I2C_RegDef_t *pI2Cx);
+void I2C_GenerateStopCondition(I2C_RegDef_t *pI2Cx);
+void I2C_SlaveEnableDisableCallbackEvents(I2C_RegDef_t *pI2Cx, uint8_t EnorDi);
 
 /* I2C application callback */
 void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle, uint8_t AppEv);
