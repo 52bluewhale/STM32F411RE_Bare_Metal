@@ -214,6 +214,18 @@ typedef struct
     volatile uint32_t FLTR;         // Offset: 0x24 - I2C TRISE register 
 } I2C_RegDef_t;
 
+/* Peripheral register for USART */
+typedef struct
+{
+    volatile uint32_t SR;           // Offset: 0x00 - USART Status register
+    volatile uint32_t DR;           // Offset: 0x04 - USART Data register
+    volatile uint32_t BRR;          // Offset: 0x08 - USART Baudrate register
+    volatile uint32_t CR1;          // Offset: 0x0C - USART Control register 1
+    volatile uint32_t CR2;          // Offset: 0x10 - USART Control register 2
+    volatile uint32_t CR3;          // Offset: 0x14 - USART Control register 3
+    volatile uint32_t GRPR;         // Offset: 0x18 - USART Guard time and prescaler register
+} USART_RegDef_t;
+
 /* ========================= PERIPHERAL DEFINITIONS ========================= */
 
 /* RCC definition */
@@ -309,6 +321,14 @@ typedef struct
 #define USART2_PCLK_DI()      (RCC->APB1ENR &= ~(1U<<17))
 #define USART6_PCLK_DI()      (RCC->APB2ENR &= ~(1U<<5))
 
+/* USARTx reset bit definitions */
+#define USART1_PCLK_RESET() \
+    do {(RCC->APB2RSTR |= (1U << 4)); (RCC->APB2RSTR &= ~(1U << 4));} while(0);
+#define USART2_PCLK_RESET() \
+    do {(RCC->APB1RSTR |= (1U << 17)); (RCC->APB1RSTR &= ~(1U << 17));} while(0);
+#define USART6_PCLK_RESET() \
+    do {(RCC->APB2RSTR |= (1U << 5)); (RCC->APB2RSTR &= ~(1U << 5));} while(0);
+
 /* SYSCFG enable bit definition */
 #define SYSCFG_PCLK_EN()      (RCC->APB2ENR |= (1U<<14))
 
@@ -334,6 +354,6 @@ typedef struct
 #define GPIO_PIN_SET        SET
 #define GPIO_PIN_RESET      RESET
 #define FLAG_SET            SET
-#define FLAG_RESET          
+#define FLAG_RESET          RESET
 
 #endif /* INC_STM32F411XX_H_ */

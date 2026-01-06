@@ -125,7 +125,7 @@ typedef struct
 #define I2C_SR2_MSL                 0           // Bit 0 MSL: Master/slave
 #define I2C_SR2_BUSY                1           // Bit 1 BUSY: Bus busy
 #define I2C_SR2_TRA                 2           // Bit 2 TRA: Transmitter/receiver
-#define I2C_SR2_MSL                 4           // Bit 4 GENCALL: General call address (Slave mode)
+#define I2C_SR2_GENCALL             4           // Bit 4 GENCALL: General call address (Slave mode)
 #define I2C_SR2_SMBDEFAULT          5           // Bit 5 SMBDEFAULT: SMBus device default address (Slave mode)
 #define I2C_SR2_SMBHOST             6           // Bit 6 SMBHOST: SMBus host header (Slave mode)
 #define I2C_SR2_DUALF               7           // Bit 7 DUALF: Dual flag (Slave mode)
@@ -165,7 +165,7 @@ typedef struct
 #define I2C_FLAG_SR2_MSL            (1U << I2C_SR2_MSL)         // Master/Slave flag
 #define I2C_FLAG_SR2_BUSY           (1U << I2C_SR2_BUSY)        // Bus busy flag
 #define I2C_FLAG_SR2_TRA            (1U << I2C_SR2_TRA)         // Transmitter/Receiver flag
-#define I2C_FLAG_SR2_MSL            (1U << I2C_SR2_GENCALL)     // General call flag
+#define I2C_FLAG_SR2_GENCALL        (1U << I2C_SR2_GENCALL)     // General call flag
 #define I2C_FLAG_SR2_SMBDEFAULT     (1U << I2C_SR2_SMBDEFAULT)  // SMBus device default flag
 #define I2C_FLAG_SR2_SMBHOST        (1U << I2C_SR2_SMBHOST)     // SMBus host header flag
 #define I2C_FLAG_SR2_DUALF          (1U << I2C_SR2_DUALF)       // Dual flag

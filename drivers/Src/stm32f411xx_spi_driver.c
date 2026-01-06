@@ -46,7 +46,26 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
     }
     else
     {
-        // TODO
+        if (pSPIx == SPI1)
+        {
+            SPI1_PCLK_DI();
+        }
+        else if (pSPIx == SPI2)
+        {
+            SPI2_PCLK_DI();
+        }
+        else if (pSPIx == SPI3)
+        {
+            SPI3_PCLK_DI();
+        }
+        else if (pSPIx == SPI4)
+        {
+            SPI4_PCLK_DI();
+        }
+        else if (pSPIx == SPI5)
+        {
+            SPI5_PCLK_DI();
+        }
     }
 }
 
@@ -205,7 +224,7 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
         }
         else
         {
-            /* 8-bit DFF hanlde */
+            /* 8-bit DFF handle */
             // 1. Load the data into the DR
             pSPIx->DR = *(pTxBuffer);
             Len--;

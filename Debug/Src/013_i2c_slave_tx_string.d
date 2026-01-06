@@ -1,0 +1,9 @@
+Src/013_i2c_slave_tx_string.o: ../Src/013_i2c_slave_tx_string.c \
+ F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h \
+ F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx_i2c_driver.h \
+ F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h \
+ F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx_gpio_driver.h
+F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h:
+F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx_i2c_driver.h:
+F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx.h:
+F:/MasteringMicroControllerandEmbeddedDriverDevelopment/stm32f4xx_drivers/drivers/Inc/stm32f411xx_gpio_driver.h:
